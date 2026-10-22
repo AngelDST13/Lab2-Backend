@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { STORE } from '../../../config/env.js';
-import { Logo } from '../../../shared/index.js';
+import { Logo, ThemeToggle } from '../../../shared/index.js';
 import { AuthForm } from '../components/AuthForm.jsx';
+import { BrandSlider } from '../components/BrandSlider.jsx';
+import { SkyDecor } from '../components/SkyDecor.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+
+const SUCCESS_PAUSE_MS = 650;
 
 const MODES = [
   { id: 'login', label: 'Ingresar' },
@@ -21,56 +25,49 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const returnTo = location.state?.from ?? '/';
+  // Distingue "ya tenía sesión al llegar" (redirigir de inmediato) de "acaba de ingresar" (mostrar el check)
+  const submittedHere = useRef(false);
 
-  if (status === 'authenticated') return <Navigate to={returnTo} replace />;
+  if (status === 'authenticated' && !submittedHere.current) return <Navigate to={returnTo} replace />;
 
   async function handleSubmit(payload) {
-    await (mode === 'login' ? login(payload) : register(payload));
-    navigate(returnTo, { replace: true });
+    submittedHere.current = true;
+    try {
+      await (mode === 'login' ? login(payload) : register(payload));
+    } catch (error) {
+      submittedHere.current = false;
+      throw error;
+    }
+    // Una pausa breve para que se vea el check de "listo" antes de entrar
+    setTimeout(() => navigate(returnTo, { replace: true }), SUCCESS_PAUSE_MS);
   }
 
   const activeIndex = MODES.findIndex((option) => option.id === mode);
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1fr_minmax(28rem,36rem)]">
-      {/* Panel de marca: solo en pantallas grandes */}
-      <aside className="relative hidden overflow-hidden bg-ink text-card lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <Link to="/" className="w-fit">
-          <Logo animated inverted />
+      {/* Panel de marca: tinta de día, cielo nocturno de noche */}
+      <aside className="relative hidden overflow-hidden bg-ink text-card transition-colors duration-700 lg:flex lg:flex-col lg:justify-between lg:p-12 dark:bg-card dark:text-ink">
+        <SkyDecor />
+        <Link to="/" className="relative w-fit">
+          <Logo animated inheritColor />
         </Link>
-        <div className="animate-rise max-w-md">
-          <p className="font-display text-5xl leading-[1.05] font-semibold tracking-tight">
-            Tecnología que funciona, sin complicaciones.
-          </p>
-          <p className="mt-6 text-card/60">
-            {STORE.tagline} con envío a todo el país. {STORE.city}.
-          </p>
+        <div className="relative">
+          <BrandSlider />
         </div>
-        <p className="font-mono text-xs text-card/40">Precios en colones · impuestos incluidos</p>
-        {/* Trazo decorativo: una pista de circuito que cruza el panel */}
-        <svg
-          className="pointer-events-none absolute -right-24 bottom-24 w-136 text-card/10"
-          viewBox="0 0 400 200"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M0 160H140L190 110H320L360 70H400"
-            pathLength="1"
-            stroke="currentColor"
-            strokeWidth="2"
-            className="animate-draw [stroke-dasharray:1]"
-            style={{ animationDuration: '1600ms' }}
-          />
-          <circle cx="190" cy="110" r="5" fill="currentColor" />
-          <circle cx="320" cy="110" r="5" className="fill-accent" />
-        </svg>
+        <p className="relative font-mono text-xs opacity-40">
+          {STORE.city} · precios en colones, impuestos incluidos
+        </p>
       </aside>
 
-      <main className="flex flex-col justify-center px-6 py-12 sm:px-12">
+      <main className="relative flex flex-col justify-center px-6 py-12 sm:px-12">
+        <div className="absolute top-6 right-6">
+          <ThemeToggle />
+        </div>
+
         <div className="mx-auto w-full max-w-sm">
           <Link to="/" className="mb-10 inline-block lg:hidden">
-            <Logo animated size="md" />
+            <Logo animated />
           </Link>
 
           <div key={mode} className="animate-page-in">

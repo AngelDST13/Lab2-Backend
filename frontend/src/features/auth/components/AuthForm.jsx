@@ -4,13 +4,22 @@ import { PasswordInput } from './PasswordInput.jsx';
 
 const EMPTY_FORM = { fullName: '', email: '', password: '' };
 
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="animate-pop size-5" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+      <path d="M5 12.5l4.5 4.5L19 7.5" pathLength="1" className="animate-draw [stroke-dasharray:1]" />
+    </svg>
+  );
+}
+
 /**
  * Formulario único para ingresar o crear cuenta.
+ * status: idle → submitting → success (check animado) o de vuelta a idle con error.
  * `attempt` cambia en cada error para volver a disparar la animación de "sacudida".
  */
 export function AuthForm({ mode, onSubmit }) {
   const [form, setForm] = useState(EMPTY_FORM);
-  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState('idle');
   const [error, setError] = useState(null);
   const [attempt, setAttempt] = useState(0);
 
@@ -19,7 +28,7 @@ export function AuthForm({ mode, onSubmit }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setSubmitting(true);
+    setStatus('submitting');
     setError(null);
     try {
       await onSubmit(
@@ -27,31 +36,30 @@ export function AuthForm({ mode, onSubmit }) {
           ? { fullName: form.fullName.trim(), email: form.email.trim(), password: form.password }
           : { email: form.email.trim(), password: form.password },
       );
+      setStatus('success');
     } catch (submitError) {
       setError(submitError);
       setAttempt((count) => count + 1);
-      setSubmitting(false);
+      setStatus('idle');
     }
   }
 
   return (
-    <form
-      key={attempt}
-      onSubmit={handleSubmit}
-      className={`space-y-5 ${attempt > 0 ? 'animate-shake' : ''}`}
-    >
+    <form key={attempt} onSubmit={handleSubmit} className={`space-y-5 ${attempt > 0 ? 'animate-shake' : ''}`}>
       {isRegister && (
-        <FormField id="fullName" label="Nombre completo">
-          <input
-            id="fullName"
-            required
-            maxLength={120}
-            autoComplete="name"
-            className={inputClassName}
-            value={form.fullName}
-            onChange={updateField('fullName')}
-          />
-        </FormField>
+        <div className="animate-rise">
+          <FormField id="fullName" label="Nombre completo">
+            <input
+              id="fullName"
+              required
+              maxLength={120}
+              autoComplete="name"
+              className={inputClassName}
+              value={form.fullName}
+              onChange={updateField('fullName')}
+            />
+          </FormField>
+        </div>
       )}
 
       <FormField id="email" label="Email">
@@ -79,8 +87,21 @@ export function AuthForm({ mode, onSubmit }) {
 
       {error && <Alert tone="error" error={error} />}
 
-      <Button type="submit" className="w-full" loading={submitting}>
-        {isRegister ? 'Crear cuenta' : 'Ingresar'}
+      <Button
+        type="submit"
+        className={`w-full ${status === 'success' ? 'bg-ok! text-card!' : ''}`}
+        loading={status === 'submitting'}
+        disabled={status === 'success'}
+      >
+        {status === 'success' ? (
+          <span className="inline-flex items-center gap-2">
+            <CheckIcon /> {isRegister ? 'Cuenta creada' : 'Listo'}
+          </span>
+        ) : isRegister ? (
+          'Crear cuenta'
+        ) : (
+          'Ingresar'
+        )}
       </Button>
     </form>
   );

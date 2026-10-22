@@ -40,9 +40,10 @@ const SIZES = {
   lg: { mark: 'size-11', text: 'text-4xl' },
 };
 
-export function Logo({ animated = false, size = 'md', inverted = false }) {
+// inheritColor: toma el color del contenedor (ej. el panel del login, que cambia entre día y noche)
+export function Logo({ animated = false, size = 'md', inheritColor = false }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${inverted ? 'text-card' : 'text-ink'}`}>
+    <span className={`inline-flex items-center gap-2.5 ${inheritColor ? '' : 'text-ink'}`}>
       <LogoMark animated={animated} className={SIZES[size].mark} />
       <span className={`font-display font-semibold tracking-tight ${SIZES[size].text}`}>{STORE.name}</span>
     </span>
