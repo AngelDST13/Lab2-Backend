@@ -194,20 +194,34 @@ Navegador → POST /api/agent/chat (cookie) → Webhook n8n (X-Webhook-Secret) �
 - El backend agrega el cliente **desde la sesión**; n8n lo envía a las herramientas en `X-Customer-Id` y el modelo no puede
   cambiarlo. Si alguien le pide al agente la orden de otra persona, la API le responde 404.
 - Herramientas: `consultar_catalogo`, `consultar_mis_ordenes`, `consultar_orden`, `validar_cupon`, `consultar_zonas_envio`.
-- Modelo principal DeepSeek con respaldo Gemini; memoria de 10 mensajes por usuario y conversación.
+- **Modelos gratuitos** (Google AI Studio, plan gratuito): principal Gemini 3.5 Flash-Lite y respaldo Gemini 3.1 Flash-Lite.
+  Son modelos distintos con cuotas separadas: si uno se satura o llega a su límite por minuto, responde el otro.
+- Memoria de 10 mensajes por usuario y conversación; cada ejecución se corta a los 55 s (el backend espera 60 s).
 
 | Credencial en n8n | Tipo | Debe coincidir con |
 | --- | --- | --- |
 | `Webhook tienda Lab2 (Header Auth)` | Header `X-Webhook-Secret` | `N8N_WEBHOOK_SECRET` del backend |
 | `API Circuito (token de servicio)` | Header `X-Service-Token` | `AGENT_SERVICE_TOKEN` del backend |
-| `DeepSeek account` / `Google Gemini(PaLM) Api account` | Modelos | — |
+| `Google Gemini(PaLM) Api account` | Google Gemini | Llave gratuita de [aistudio.google.com](https://aistudio.google.com/apikey) |
+
+**Usar otro proveedor gratuito** (Groq u OpenRouter): crear la llave en su sitio, agregarla en n8n como credencial
+(Groq tiene nodo propio; OpenRouter usa el nodo *OpenAI Chat Model* con URL base `https://openrouter.ai/api/v1`)
+y conectar ese nodo como modelo principal o de respaldo del agente.
 
 ## Interfaz
 
 - **Logo** (`shared/components/Logo.jsx`, `public/favicon.svg`): una "C" trazada como pista de circuito con un nodo central
   en el único color de acento. Se dibuja al cargar el login.
+- **Modo día y noche** (`shared/theme/ThemeContext.jsx`, `shared/components/ThemeToggle.jsx`): interruptor deslizante
+  donde el sol se transforma en luna. El tema nuevo se revela en un círculo que crece desde el interruptor
+  (View Transitions API). Arranca según el sistema operativo, se recuerda entre visitas y no parpadea al recargar
+  (un script en `index.html` lo aplica antes de pintar). Los colores son variables CSS: el modo noche solo las redefine.
+- **Login**: slider de mensajes de marca (avanza cada 6 s con barra de progreso; se pausa con el mouse, el foco o el botón;
+  flechas del teclado), íconos que se dibujan al entrar, cielo con sol de día y estrellas con luna de noche, una señal
+  que recorre la pista de circuito, línea de acento en el campo enfocado y check animado al ingresar.
 - **Animaciones** (solo CSS, `styles/index.css`): entrada de página, escalonado de listas, barras que crecen desde su base,
-  sacudida en error de login, pulso del carrito, menú móvil. Se desactivan con `prefers-reduced-motion`.
+  sacudida en error de login, pulso del carrito, menú móvil. Con `prefers-reduced-motion` se desactivan y el slider
+  deja de avanzar solo.
 - **Responsive**: menú móvil animado y tablas con desplazamiento propio; sin desbordes a 390 px.
 
 ## Datos de prueba
