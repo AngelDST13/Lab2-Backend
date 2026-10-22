@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router';
 import { STORE } from '../config/env.js';
 import { useAuth } from '../features/auth/index.js';
 import { useCart } from '../features/cart/index.js';
-import { Logo } from '../shared/index.js';
+import { Logo, ThemeToggle } from '../shared/index.js';
 import { NavLinks } from './NavLinks.jsx';
 import { UserMenu } from './UserMenu.jsx';
 
@@ -41,7 +41,7 @@ export function Layout() {
       </p>
 
       <header className="sticky top-0 z-20 border-b border-line bg-paper/90 backdrop-blur-sm">
-        <nav className="mx-auto flex max-w-6xl items-center gap-8 px-4 py-4 sm:px-6" aria-label="Principal">
+        <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-4 sm:px-6 md:gap-8" aria-label="Principal">
           <Link to="/" className="mr-auto" aria-label={`${STORE.name}, inicio`}>
             <Logo />
           </Link>
@@ -49,6 +49,7 @@ export function Layout() {
           <div className="hidden items-center gap-8 md:flex">
             <NavLinks itemCount={itemCount} />
           </div>
+          <ThemeToggle />
           <div className="hidden md:block">
             <UserMenu />
           </div>

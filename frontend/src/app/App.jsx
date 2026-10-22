@@ -5,7 +5,7 @@ import { CartPage, CartProvider } from '../features/cart/index.js';
 import { OrderDetailPage, OrdersPage } from '../features/orders/index.js';
 import { CatalogPage, InventoryPage } from '../features/products/index.js';
 import { SummaryPage } from '../features/summary/index.js';
-import { EmptyState } from '../shared/index.js';
+import { EmptyState, ThemeProvider } from '../shared/index.js';
 import { Layout } from './Layout.jsx';
 
 function NotFoundPage() {
@@ -20,6 +20,7 @@ function NotFoundPage() {
 
 export function App() {
   return (
+    <ThemeProvider>
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
@@ -76,5 +77,6 @@ export function App() {
         </BrowserRouter>
       </CartProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 }

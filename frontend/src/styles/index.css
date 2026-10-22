@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+/* dark:… se activa con data-theme="dark" (lo controla el interruptor, no solo el sistema) */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /*
  * Tokens de diseño de Circuito. Tailwind genera utilidades a partir de ellos:
  * bg-paper, text-ink, border-line, text-accent, font-display, animate-page-in...
+ * Las utilidades leen las variables en tiempo real, así que el modo noche
+ * solo redefine los colores (ver :root[data-theme="dark"] más abajo).
  */
 @theme {
   --color-paper: #f5f2eb;
@@ -31,6 +36,10 @@
   --animate-bump: bump 300ms var(--ease-out-soft);
   --animate-draw: draw 900ms var(--ease-out-soft) both;
   --animate-grow-y: grow-y 600ms var(--ease-out-soft) both;
+  --animate-slide-in: slide-in 700ms var(--ease-out-soft) both;
+  --animate-progress: progress linear both;
+  --animate-pop: pop 380ms var(--ease-out-soft) both;
+  --animate-twinkle: twinkle 2.4s ease-in-out infinite;
 
   @keyframes page-in {
     from { opacity: 0; transform: translateY(6px); }
@@ -57,6 +66,49 @@
     from { stroke-dashoffset: 1; }
     to { stroke-dashoffset: 0; }
   }
+  /* Slider del login: cada diapositiva entra desde la derecha y se enfoca */
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateX(28px); filter: blur(4px); }
+    to { opacity: 1; transform: translateX(0); filter: blur(0); }
+  }
+  /* Barra de progreso de la diapositiva activa (su duración la define el componente) */
+  @keyframes progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  @keyframes pop {
+    0% { opacity: 0; transform: scale(0.6); }
+    60% { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+}
+
+/* ── Modo noche ───────────────────────────────────────────────────────
+ * Misma paleta invertida: papel oscuro y tinta clara. El acento se aclara
+ * para mantener el contraste sobre fondo oscuro.
+ */
+:root[data-theme="dark"] {
+  --color-paper: #141311;
+  --color-paper-deep: #201e1b;
+  --color-card: #1a1917;
+  --color-ink: #ede8de;
+  --color-ink-soft: #c6c0b4;
+  --color-muted: #8f8a7f;
+  --color-line: #36332e;
+  --color-accent: #ec6e3d;
+  --color-accent-deep: #f4946a;
+  --color-ok: #74bd8e;
+  --color-warn: #dba64b;
+  --color-danger: #ec7a64;
+  color-scheme: dark;
+}
+
+:root {
+  color-scheme: light;
 }
 
 @layer base {
@@ -71,6 +123,25 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-accent;
   }
+}
+
+/* ── Transición día/noche ─────────────────────────────────────────────
+ * Con la View Transitions API el tema nuevo se revela en un círculo que
+ * crece desde el interruptor (--theme-x/--theme-y los fija ThemeToggle).
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-reveal 650ms var(--ease-out-soft);
+}
+
+@keyframes theme-reveal {
+  from { clip-path: circle(0 at var(--theme-x, 50%) var(--theme-y, 0%)); }
+  to { clip-path: circle(150vmax at var(--theme-x, 50%) var(--theme-y, 0%)); }
 }
 
 @utility label-caps {
@@ -94,9 +165,11 @@
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
-  *::after {
+  *::after,
+  ::view-transition-new(root) {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
   }
