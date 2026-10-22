@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de diseño de Circuito. Tailwind genera utilidades a partir de ellos:
+ * bg-paper, text-ink, border-line, text-accent, font-display, animate-page-in...
+ */
+@theme {
+  --color-paper: #f5f2eb;
+  --color-paper-deep: #ece7dc;
+  --color-card: #fbfaf6;
+  --color-ink: #1c1b18;
+  --color-ink-soft: #3d3b35;
+  --color-muted: #75726a;
+  --color-line: #d8d2c4;
+  --color-accent: #d4501c;
+  --color-accent-deep: #a83c12;
+  --color-ok: #2f6b45;
+  --color-warn: #a86a12;
+  --color-danger: #b0321f;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Una sola curva para todo el sitio: arranca rápido y frena suave */
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --animate-page-in: page-in 320ms var(--ease-out-soft) both;
+  --animate-rise: rise 420ms var(--ease-out-soft) both;
+  --animate-shake: shake 360ms ease-in-out;
+  --animate-bump: bump 300ms var(--ease-out-soft);
+  --animate-draw: draw 900ms var(--ease-out-soft) both;
+  --animate-grow-y: grow-y 600ms var(--ease-out-soft) both;
+
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  @keyframes bump {
+    50% { transform: scale(1.25); }
+  }
+  /* Las barras crecen desde su base (no se desplazan): nunca cruzan la línea del eje */
+  @keyframes grow-y {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+  @keyframes draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent text-card;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+}
+
+@utility label-caps {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Escalonado: cada elemento define --i (su posición) y entra un poco después del anterior */
+@utility stagger {
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+/* Accesibilidad: quien pide menos movimiento recibe la interfaz sin animaciones */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
