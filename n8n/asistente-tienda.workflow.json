@@ -2,7 +2,7 @@
   "id": "lab2AsistenteTienda",
   "name": "[Laboratorio2] tienda - asistente de compras",
   "active": false,
-  "settings": { "executionOrder": "v1" },
+  "settings": { "executionOrder": "v1", "executionTimeout": 55 },
   "tags": [],
   "pinData": {},
   "nodes": [
@@ -26,7 +26,7 @@
       "typeVersion": 1,
       "position": [700, -140],
       "parameters": {
-        "content": "## 2 · Agente de IA\n**Principal:** DeepSeek · **Respaldo:** Gemini 3.5 Flash-Lite. Memoria de 10 mensajes por usuario + conversación.\nHerramientas **solo de lectura** con token de servicio (`X-Service-Token`) y `X-Customer-Id` tomado del webhook: la API aplica los mismos permisos que al cliente, así el agente nunca ve órdenes ajenas aunque se lo pidan.",
+        "content": "## 2 · Agente de IA\n**Modelos gratuitos de Google AI Studio** — principal: Gemini 3.5 Flash-Lite · respaldo: Gemini 3.1 Flash-Lite (cuotas separadas: si uno se satura responde el otro). Para usar otro proveedor gratuito (Groq, OpenRouter) basta con cambiar el nodo de modelo y su credencial.\nMemoria de 10 mensajes por usuario + conversación. Tiempo máximo por ejecución: 55 s (el backend corta a los 60 s).\nHerramientas **solo de lectura** con token de servicio (`X-Service-Token`) y `X-Customer-Id` tomado del webhook: la API aplica los mismos permisos que al cliente, así el agente nunca ve órdenes ajenas aunque se lo pidan.",
         "width": 900,
         "height": 200,
         "color": 4
@@ -130,12 +130,12 @@
     {
       "id": "b1d1c6a0-0001-4c00-9000-000000000021",
       "name": "Modelo principal",
-      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [600, 420],
-      "parameters": { "model": "deepseek-chat", "options": { "temperature": 0.3 } },
+      "parameters": { "modelName": "models/gemini-3.5-flash-lite", "options": { "temperature": 0.3 } },
       "credentials": {
-        "deepSeekApi": { "id": "Wq2NQ8OQ4vLDFcgF", "name": "DeepSeek account" }
+        "googlePalmApi": { "id": "2FPc7gjeFTG40fQU", "name": "Google Gemini(PaLM) Api account" }
       }
     },
     {
@@ -144,7 +144,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [740, 420],
-      "parameters": { "modelName": "models/gemini-3.5-flash-lite", "options": { "temperature": 0.3 } },
+      "parameters": { "modelName": "models/gemini-3.1-flash-lite", "options": { "temperature": 0.3 } },
       "credentials": {
         "googlePalmApi": { "id": "2FPc7gjeFTG40fQU", "name": "Google Gemini(PaLM) Api account" }
       }
