@@ -196,7 +196,10 @@ Navegador → POST /api/agent/chat (cookie) → Webhook n8n (X-Webhook-Secret) �
 - Herramientas: `consultar_catalogo`, `consultar_mis_ordenes`, `consultar_orden`, `validar_cupon`, `consultar_zonas_envio`.
 - **Modelos gratuitos** (Google AI Studio, plan gratuito): principal Gemini 3.5 Flash-Lite y respaldo Gemini 3.1 Flash-Lite.
   Son modelos distintos con cuotas separadas: si uno se satura o llega a su límite por minuto, responde el otro.
-- Memoria de 10 mensajes por usuario y conversación; cada ejecución se corta a los 55 s (el backend espera 60 s).
+- **Memoria en el backend** (`src/services/conversationMemory.js`): guarda solo el texto de los últimos 6 intercambios por
+  usuario y conversación (30 min de vida) y lo envía a n8n en `history`. No se usa el nodo de memoria de n8n porque, al
+  recortar mensajes viejos, dejaba llamadas a herramientas sin su pregunta y Gemini respondía `400`, rompiendo la conversación.
+- Límite de 10 mensajes por minuto por usuario; cada ejecución de n8n se corta a los 55 s (el backend espera 60 s).
 
 | Credencial en n8n | Tipo | Debe coincidir con |
 | --- | --- | --- |
