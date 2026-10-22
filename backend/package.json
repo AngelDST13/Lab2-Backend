@@ -1,0 +1,23 @@
+{
+  "name": "tienda-lab2-backend",
+  "version": "1.0.0",
+  "description": "API REST por capas para la tienda online (Laboratorio #2, Caso 5)",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --watch-path=src src/server.js",
+    "start": "node src/server.js",
+    "db:init": "node db/init.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "helmet": "^8.0.0",
+    "zod": "^3.23.8"
+  }
+}
